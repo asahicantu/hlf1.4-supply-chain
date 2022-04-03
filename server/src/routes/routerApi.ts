@@ -1,12 +1,15 @@
 import express from 'express';
-import HyperledgerRouter from './hyperledger.router';
+import ChaincodeRouter from './chaincode.router';
+import AdminRouter from './admin.router';
 
 function routerApi(app: express.Express, rootApi: string){
   const router = express.Router();
-  const hyperledgerRouter = new HyperledgerRouter();
+  const chaincodeRouter = new ChaincodeRouter();
+  const adminRouter = new AdminRouter();
   app.use(express.json());
   app.use(rootApi, router);
-  router.use('/hyp', hyperledgerRouter.router);
+  router.use('/admin', adminRouter.router);
+  router.use('/hyp', chaincodeRouter.router);
 }
 
 export default routerApi;

@@ -3,9 +3,9 @@ import Boom from 'boom';
 import ChaincodeService from '../services/chaincode.service';
 var _ = require('underscore');
 import validatorHandler from '../middlewares/validator.handler';
-import { ConnectionParams } from 'services/hyperledgerParams.interface';
+import ConnectionParams from '../services/connectionParams.interface';
 const { getChaincodeEventsSchema } = require( '../schemas/hyperledger.schemas');
-class HyperledgerRouter {
+class ChaincodeRouter {
   router: express.Router;
   service: ChaincodeService;
 
@@ -56,4 +56,4 @@ class HyperledgerRouter {
     });
   }
 }
-export default HyperledgerRouter;
+export default ChaincodeRouter;

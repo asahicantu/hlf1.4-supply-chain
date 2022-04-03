@@ -5,7 +5,7 @@
  */
 
 import FabricCAServices = require('fabric-ca-client');
-import { Wallet } from 'fabric-network';
+import { Wallet,Wallets } from 'fabric-network';
 
 const adminUserId = 'admin';
 const adminUserPasswd = 'adminpw';
@@ -96,6 +96,22 @@ const registerAndEnrollUser = async (caClient: FabricCAServices, wallet: Wallet,
         console.error(`Failed to register user : ${error}`);
     }
 };
+
+const buildWallet = async (walletPath: string): Promise<Wallet> => {
+  // Create a new  wallet : Note that wallet is for managing identities.
+  let wallet: Wallet;
+  if (walletPath) {
+      wallet = await Wallets.newFileSystemWallet(walletPath);
+      console.log(`Built a file system wallet at ${walletPath}`);
+  } else {
+      wallet = await Wallets.newInMemoryWallet();
+      console.log('Built an in memory wallet');
+  }
+
+  return wallet;
+};
+
+
 
 export {
     buildCAClient,

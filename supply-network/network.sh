@@ -102,7 +102,8 @@ done
 
 if [ "$MODE" == "start" ]; then
     ./scripts/start.sh
-    ./scripts/deployCC.sh $CHANNEL_NAME "erc721" "../chaincode/token-erc-721/chaincode-javascript" "javascript"
+    chaincodeName="erc721"
+    ./scripts/deployCC.sh $CHANNEL_NAME $chaincodeName "../chaincode/token-erc-721/chaincode-javascript" "javascript"
 elif [ "$MODE" == "deployCC" ]; then
     infoln "Deploying chaincode"
     #example 
