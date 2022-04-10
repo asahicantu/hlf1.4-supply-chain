@@ -1,4 +1,4 @@
-import { Gateway, GatewayOptions, Identity, Wallet, Wallets } from 'fabric-network';
+import { Gateway, GatewayOptions, Identity, Wallet, Wallets} from 'fabric-network';
 import { User, UserConfig, Client } from 'fabric-common';
 import * as path from 'path';
 import FabricCAServices = require('fabric-ca-client');
@@ -6,6 +6,7 @@ import { object } from 'joi';
 import { serialize } from 'v8';
 import { sign } from 'crypto';
 import { ConnectOptions } from '@hyperledger/fabric-gateway';
+import { getDefaultLibFileName } from 'typescript';
 
 class AdminService {
   adminUserId: string = process.env.HYP_ADMIN_USER_ID as string;
@@ -24,13 +25,18 @@ class AdminService {
     return caClient;
   }
 
-  async buildWallet(walletPath: string | undefined): Promise<Wallet> {
+  async buildWallet(walletPath: string | undefined, couchDbUrl:string|undefined): Promise<Wallet> {
     // Create a new  wallet : Note that wallet is for managing identities.
     let wallet: Wallet;
     if (walletPath) {
       wallet = await Wallets.newFileSystemWallet(walletPath);
       console.log(`Built a file system wallet at ${walletPath}`);
-    } else {
+    } else if(couchDbUrl) {
+      console.log(`Building a couchDb wallet at ${couchDbUrl}`);
+      wallet = await Wallets.newCouchDBWallet("http://admin:adminpw@localhost:7984","wallet");
+      console.log('CouchDB wallet built');
+    }
+    else{
       wallet = await Wallets.newInMemoryWallet();
       console.log('Built an in memory wallet');
     }
@@ -173,7 +179,7 @@ class AdminService {
   }
 
 
-  async balance(ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, tokenId:string, tokenUrl:string):Promise<string> {
+  async chaincode(ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, tokenId:string, tokenUrl:string):Promise<string> {
     const gateway = new Gateway();
     const gatewayOpts: GatewayOptions = {
       wallet: wallet,
@@ -188,11 +194,12 @@ class AdminService {
       console.log('Getting contract...');
       const contract = network.getContract(chaincodeName);
       console.log('Executing Chaincode...');
-      const result = await contract.evaluateTransaction('ClientAccountID');
-      console.log('*** Result: committed', result);
+      const result = await contract.evaluateTransaction('Name');
+      console.log('*** Result: committed', result.toString());
       if (`${result}` !== '') {
-        const resultMessage = this.prettyJSONString(result.toString());
-        return resultMessage;
+        console.log(result.toString());
+        //const resultMessage = this.prettyJSONString(result.toString());
+        return result.toString();
       }
       return "ok";
     }

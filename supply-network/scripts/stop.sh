@@ -11,9 +11,11 @@ docker compose \
     -f ./compose/docker-compose-explorer.yaml \
     -f ./compose/docker-compose-ipfs.yaml \
     down --remove-orphans
-docker network prune -f
-docker volume prune -f
-docker container prune -f
+docker rmi $(docker image ls |  grep example.com)
+docker volume rm $(docker volume ls | grep nft_)
+#docker network prune -f
+#docker volume prune -f
+#docker container prune -f
 
 infoln "Removing Dirs...."
 removeFile "log.txt"
