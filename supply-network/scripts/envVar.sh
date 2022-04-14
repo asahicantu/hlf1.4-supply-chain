@@ -23,3 +23,6 @@ export PEER0_ORG3_CA=${PWD}/organizations/peerOrganizations/org3.example.com/tls
 export EXPLORER_CONFIG_FILE_PATH=${PWD}/config/explorer/config.json
 export EXPLORER_PROFILE_DIR_PATH=${PWD}/config/explorer/connection-profile
 export FABRIC_CRYPTO_PATH=${PWD}/organizations
+
+export FABRIC_USER_ADMIN=admin
+export FABRIC_USER_ADMIN_PW=adminpw

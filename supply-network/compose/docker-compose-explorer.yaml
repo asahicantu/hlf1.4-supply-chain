@@ -18,8 +18,8 @@ services:
     hostname: explorerdb.example.com
     environment:
       - DATABASE_DATABASE=fabricexplorer
-      - DATABASE_USERNAME=hppoc
-      - DATABASE_PASSWORD=password
+      - DATABASE_USERNAME=${FABRIC_USER_ADMIN}
+      - DATABASE_PASSWORD=${FABRIC_USER_ADMIN_PW}
     healthcheck:
       test: "pg_isready -h localhost -p 5432 -q -U postgres"
       interval: 30s
@@ -37,8 +37,8 @@ services:
     environment:
       - DATABASE_HOST=explorerdb.example.com
       - DATABASE_DATABASE=fabricexplorer
-      - DATABASE_USERNAME=hppoc
-      - DATABASE_PASSWD=password
+      - DATABASE_USERNAME=${FABRIC_USER_ADMIN}
+      - DATABASE_PASSWD=${FABRIC_USER_ADMIN_PW}
       - LOG_LEVEL_APP=info
       - LOG_LEVEL_DB=info
       - LOG_LEVEL_CONSOLE=debug
