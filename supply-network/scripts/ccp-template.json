@@ -19,7 +19,8 @@
             ],
             "certificateAuthorities": [
                 "ca.org${ORG}.example.com"
-            ]
+            ],
+            "walletUrl": "http://${COUCHDB_USR}:${COUCHDB_PSW}@localhost:${COUCHDB_PORT}"
         }
     },
     "peers": {

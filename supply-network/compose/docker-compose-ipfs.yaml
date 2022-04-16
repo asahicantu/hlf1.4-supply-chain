@@ -41,7 +41,7 @@ services:
       - ipfs-node0
     environment:
       CLUSTER_PEERNAME: ipfs-cluster0
-      CLUSTER_SECRET: ${CLUSTER_SECRET} # From shell variable if set
+      CLUSTER_SECRET: ${IPFS_CLUSTER_SECRET}
       CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs-node0/tcp/7005
       CLUSTER_CRDT_TRUSTEDPEERS: '*' # Trust all peers in Cluster
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API

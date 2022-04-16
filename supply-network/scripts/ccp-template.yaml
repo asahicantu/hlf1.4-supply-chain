@@ -14,6 +14,7 @@ organizations:
     - peer0.org${ORG}.example.com
     certificateAuthorities:
     - ca.org${ORG}.example.com
+    walletUrl: http://${COUCHDB_USR}:${COUCHDB_PSW}@localhost:${COUCHDB_PORT}
 peers:
   peer0.org${ORG}.example.com:
     url: grpcs://localhost:${P0PORT}

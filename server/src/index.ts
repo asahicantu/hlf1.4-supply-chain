@@ -14,9 +14,9 @@ const port = process.env.PORT;
 
 const whitelist =
   [`http://localhost:${port}}`, //Server endpoint
-    'http://localhost:17054', //ca_org1
-    'http://localhost:18054', //ca_org2
-    'http://localhost:19054', //ca_orderer
+  'http://localhost:18054', //ca_org2
+  'http://localhost:17054', //ca_org1
+  'http://localhost:19054', //ca_orderer
     'http://localhost:7051', //peer0.org1.example.com
     'http://localhost:7050', //orderer.example.com
     'http://localhost:9051', //peer0.org2.example.com

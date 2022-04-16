@@ -3,7 +3,7 @@ import Boom from 'boom';
 import ChaincodeService from '../services/chaincode.service';
 var _ = require('underscore');
 import validatorHandler from '../middlewares/validator.handler';
-import ConnectionParams from '../services/connectionParams.interface';
+import ConnectionParams from 'interfaces/connectionParams.interface';
 const { getChaincodeEventsSchema } = require( '../schemas/hyperledger.schemas');
 class ChaincodeRouter {
   router: express.Router;

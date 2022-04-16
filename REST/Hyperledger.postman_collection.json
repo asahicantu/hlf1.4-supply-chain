@@ -1,0 +1,495 @@
+{
+	"info": {
+		"_postman_id": "2164d358-8155-4775-8eb1-cee96a579e42",
+		"name": "Hyperledger",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Hyp",
+			"item": [
+				{
+					"name": "Root",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "/",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Connect",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\"connectionParams\":{\r\n    \"chaincodeName\": 'erc721',\r\n    \"channelName\": 'mychannel',\r\n    \"idName\": 'User1',\r\n    \"mspId\": 'Org1MSP',\r\n    \"organization\": 'org1.example.com',\r\n    \"peerEndpoint\": 'localhost:7051',\r\n    \"peerName\": 'peer0'\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/hyp/connect",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"hyp",
+								"connect"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Root",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"path\": \"wallets\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/wallet",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"wallet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "registerOrganization",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test-network-org1\",\r\n    \"version\": \"1.0.0\",\r\n    \"client\": {\r\n        \"organization\": \"Org1\",\r\n        \"connection\": {\r\n            \"timeout\": {\r\n                \"peer\": {\r\n                    \"endorser\": \"300\"\r\n                }\r\n            }\r\n        }\r\n    },\r\n    \"organizations\": {\r\n        \"Org1\": {\r\n            \"mspid\": \"Org1MSP\",\r\n            \"peers\": [\r\n                \"peer0.org1.example.com\"\r\n            ],\r\n            \"certificateAuthorities\": [\r\n                \"ca.org1.example.com\"\r\n            ],\r\n            \"walletUrl\": \"http://admin:adminpw@localhost:5984\"\r\n        }\r\n    },\r\n    \"peers\": {\r\n        \"peer0.org1.example.com\": {\r\n            \"url\": \"grpcs://localhost:7051\",\r\n            \"tlsCACerts\": {\r\n                \"pem\": \"-----BEGIN CERTIFICATE-----\\nMIICJjCCAc2gAwIBAgIUCX0p3oh7mN4wUHEpllYdZiKznHcwCgYIKoZIzj0EAwIw\\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwNDE0MTY1MTAwWhcNMzcwNDEwMTY1MTAw\\nWjBwMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExDzANBgNV\\nBAcTBkR1cmhhbTEZMBcGA1UEChMQb3JnMS5leGFtcGxlLmNvbTEcMBoGA1UEAxMT\\nY2Eub3JnMS5leGFtcGxlLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKQi\\nEzycn39WFdo/uemTYXxj6Vpt0Jbr9QYFtPTAMCyCD4BdQFe/p74QVY5yNd1U3IAA\\nOkQJNWtRKNa6wIBvkGujRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG\\nAQH/AgEBMB0GA1UdDgQWBBRpDLl92BnYwaFPHmLX9SQ+5B+B9DAKBggqhkjOPQQD\\nAgNHADBEAiAT0ARfRZBbWZpcmwB/hb6wnDVFhx7XLraPZ7k6+uvirwIgUIr0Ynaj\\n1vOjAD46aQokmCZkoV5mZmSE2y8wcsAkpEA=\\n-----END CERTIFICATE-----\\n\"\r\n            },\r\n            \"grpcOptions\": {\r\n                \"ssl-target-name-override\": \"peer0.org1.example.com\",\r\n                \"hostnameOverride\": \"peer0.org1.example.com\"\r\n            }\r\n        }\r\n    },\r\n    \"certificateAuthorities\": {\r\n        \"ca.org1.example.com\": {\r\n            \"url\": \"https://localhost:7054\",\r\n            \"caName\": \"ca-org1\",\r\n            \"tlsCACerts\": {\r\n                \"pem\": [\"-----BEGIN CERTIFICATE-----\\nMIICJjCCAc2gAwIBAgIUCX0p3oh7mN4wUHEpllYdZiKznHcwCgYIKoZIzj0EAwIw\\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwNDE0MTY1MTAwWhcNMzcwNDEwMTY1MTAw\\nWjBwMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExDzANBgNV\\nBAcTBkR1cmhhbTEZMBcGA1UEChMQb3JnMS5leGFtcGxlLmNvbTEcMBoGA1UEAxMT\\nY2Eub3JnMS5leGFtcGxlLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKQi\\nEzycn39WFdo/uemTYXxj6Vpt0Jbr9QYFtPTAMCyCD4BdQFe/p74QVY5yNd1U3IAA\\nOkQJNWtRKNa6wIBvkGujRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG\\nAQH/AgEBMB0GA1UdDgQWBBRpDLl92BnYwaFPHmLX9SQ+5B+B9DAKBggqhkjOPQQD\\nAgNHADBEAiAT0ARfRZBbWZpcmwB/hb6wnDVFhx7XLraPZ7k6+uvirwIgUIr0Ynaj\\n1vOjAD46aQokmCZkoV5mZmSE2y8wcsAkpEA=\\n-----END CERTIFICATE-----\\n\"]\r\n            },\r\n            \"httpOptions\": {\r\n                \"verify\": false\r\n            }\r\n        }\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/register",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "enrollUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\":\"Org1\",\r\n    \"name\":\"minter\",\r\n    \"affiliation\":\"org1.department1\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/enroll",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "mint",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"params\":\r\n    {\r\n        \"tokenId\":\"6\",\r\n        \"tokenUrl\":\"http://token.com\"\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/mint",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"mint"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "balance",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"BalanceOf\",\r\n    \"params\":\r\n    {\r\n        \"p1\":\"x509::/OU=client/CN=minter::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com\"\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "owner",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"OwnerOf\",\r\n    \"params\":\r\n    {\r\n        \"owner\":\"9\"\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetApproved",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"GetApproved\",\r\n    \"params\":\r\n    {\r\n        \"owner\":\"9\"\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Name",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"Name\",\r\n    \"params\":\r\n    {\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TokenURI",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"TokenURI\",\r\n    \"params\":\r\n    {\r\n        \"tokenId\":\"9\"\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TotalSupply",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"TotalSupply\",\r\n    \"params\":\r\n    {\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SetTokenName",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"SetOption\",\r\n    \"params\":\r\n    {\r\n        \"name\":\"PRIME_NFT\",\r\n        \"symbol\": \"PRM\"\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Symbol",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"Symbol\",\r\n    \"params\":\r\n    {\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ClientAccountBalance",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"Symbol\",\r\n    \"params\":\r\n    {\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ClientAccountId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Org1\",\r\n    \"userId\":\"minter\",\r\n    \"channel\":\"mychannel\",\r\n    \"name\": \"erc721\",\r\n    \"functionName\":\"ClientAccountID\",\r\n    \"params\":\r\n    {\r\n    }\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{rootUrl}}/admin/chaincode",
+							"host": [
+								"{{rootUrl}}"
+							],
+							"path": [
+								"admin",
+								"chaincode"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "rootUrl",
+			"value": "http://localhost:3556/api/v1",
+			"type": "string"
+		}
+	]
+}

@@ -1,13 +1,7 @@
-import { Gateway, GatewayOptions, Identity, Wallet, Wallets} from 'fabric-network';
-import { User, UserConfig, Client } from 'fabric-common';
-import * as path from 'path';
+import { Gateway, GatewayOptions, Wallet, Wallets} from 'fabric-network';
+import { User, Client } from 'fabric-common';
 import FabricCAServices = require('fabric-ca-client');
-import { object } from 'joi';
-import { serialize } from 'v8';
-import { sign } from 'crypto';
-import { ConnectOptions } from '@hyperledger/fabric-gateway';
-import { getDefaultLibFileName } from 'typescript';
-
+// import {ChaincodeExecOption} from 'interfaces/enums.interface';
 class AdminService {
   adminUserId: string = process.env.HYP_ADMIN_USER_ID as string;
   adminUserPasswd: string = process.env.HYP_ADMIN_USER_PW as string;
@@ -16,16 +10,15 @@ class AdminService {
    *
  * @param {*} ccp = Organization Config profile
  */
-  buildCAClient(ccp: Record<string, any>, caHostName: string): FabricCAServices {
+  buildCAClient(caConfig: any): FabricCAServices {
     // Create a new CA client for interacting with the CA.
-    const caInfo = ccp.certificateAuthorities[caHostName]; // lookup CA details from config
-    const caTLSCACerts = caInfo.tlsCACerts.pem;
-    const caClient = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
-    console.log(`Certificate Authority client  [${caInfo.caName}] built`);
+    const caTLSCACerts = caConfig.tlsCACerts.pem;
+    const caClient = new FabricCAServices(caConfig.url, { trustedRoots: caTLSCACerts, verify: false }, caConfig.caName);
+    console.log(`Certificate Authority client  [${caConfig.name}] built`);
     return caClient;
   }
 
-  async buildWallet(walletPath: string | undefined, couchDbUrl:string|undefined): Promise<Wallet> {
+   async buildWallet(walletPath: string | undefined, couchDbUrl:string|undefined): Promise<Wallet> {
     // Create a new  wallet : Note that wallet is for managing identities.
     let wallet: Wallet;
     if (walletPath) {
@@ -33,7 +26,7 @@ class AdminService {
       console.log(`Built a file system wallet at ${walletPath}`);
     } else if(couchDbUrl) {
       console.log(`Building a couchDb wallet at ${couchDbUrl}`);
-      wallet = await Wallets.newCouchDBWallet("http://admin:adminpw@localhost:7984","wallet");
+      wallet = await Wallets.newCouchDBWallet(couchDbUrl,"wallet");
       console.log('CouchDB wallet built');
     }
     else{
@@ -145,7 +138,7 @@ class AdminService {
     wallet.put(userId, identity);
   }
 
-  async mint(ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, tokenId:string, tokenUrl:string):Promise<string> {
+  async mint(config: Record<string,any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, tokenId:string, tokenUrl:string):Promise<string> {
     const gateway = new Gateway();
     const gatewayOpts: GatewayOptions = {
       wallet: wallet,
@@ -153,8 +146,11 @@ class AdminService {
       discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
     };
     try {
+      let client = new Client(userId);
+      console.log(client);
       console.log('Connecting to gateway...');
-      await gateway.connect(ccp, gatewayOpts);
+      await gateway.connect(config, gatewayOpts);
+      console.log(gateway.getIdentity());
       console.log('Getting network...', channelName);
       const network = await gateway.getNetwork(channelName);
       console.log('Getting contract...');
@@ -179,7 +175,7 @@ class AdminService {
   }
 
 
-  async chaincode(ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, tokenId:string, tokenUrl:string):Promise<string> {
+  async chaincode(execMode:string, ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, functionName:string, ...args:string[]):Promise<string|any> {
     const gateway = new Gateway();
     const gatewayOpts: GatewayOptions = {
       wallet: wallet,
@@ -193,15 +189,21 @@ class AdminService {
       const network = await gateway.getNetwork(channelName);
       console.log('Getting contract...');
       const contract = network.getContract(chaincodeName);
-      console.log('Executing Chaincode...');
-      const result = await contract.evaluateTransaction('Name');
+      let result :any;
+      if(execMode == 'Read'){
+        console.log('Reading Chaincode...');
+        result = await contract.evaluateTransaction(functionName,...args);
+      }
+      if(execMode == 'Write'){
+        console.log('Executing Chaincode...');
+        result = await contract.submitTransaction(functionName,...args);
+      }
       console.log('*** Result: committed', result.toString());
       if (`${result}` !== '') {
-        console.log(result.toString());
         //const resultMessage = this.prettyJSONString(result.toString());
-        return result.toString();
+        return result;
       }
-      return "ok";
+      return result.toString();
     }
     catch(error){
       throw(error);

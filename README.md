@@ -318,3 +318,8 @@ peer lifecycle chaincode querycommitted --channelID mychannel --name erc721
 
 # ReactJS
 npx create-react-app react-nft-app
+
+## IPFS SERVER
+### Docker configuration for a private IPFS NETWORK
+[https://github.com/owenlo/private-ipfs-docker](https://github.com/owenlo/private-ipfs-docker)
+[https://github.com/ipfs/ipfs-cluster](https://github.com/ipfs/ipfs-cluster)

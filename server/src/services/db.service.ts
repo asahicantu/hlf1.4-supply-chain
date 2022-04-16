@@ -1,4 +1,5 @@
 import { Console } from 'console';
+import { ConfigSet } from 'interfaces/register.interface';
 import *  as Nano from 'nano';
 class DBService {
   nano: Nano.ServerScope;
@@ -40,9 +41,9 @@ class DBService {
     return await this.nano.info();
   }
 
-  async registerOrg(connectionConfig: object): Promise<Nano.DocumentInsertResponse | unknown> {
+  async registerOrg(configSet: object): Promise<Nano.DocumentInsertResponse | unknown> {
     try {
-      const response = await this.db.insert(connectionConfig);
+      const response = await this.db.insert(configSet);
       return response;
     }
     catch (error) {
@@ -50,12 +51,15 @@ class DBService {
     }
   }
 
-  async GetConnectionConfig(orgConfig: string): Promise<unknown> {
-    {
-      const val: Nano.DocumentGetResponse = await this.db.get(orgConfig);
+  async GetConfig(orgConfig: string): Promise<any> {
+    try{
+      const val = (await this.db.get(orgConfig) as Object) as ConfigSet;
       return val;
     }
+    catch(error){
+      console.log(error);
+      return undefined;
+    }
   }
-
 }
 export default DBService;

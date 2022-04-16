@@ -1,12 +1,12 @@
 import express, { NextFunction } from 'express';
-import CCParams from 'interfaces/ccPArams.interface';
 import Boom from 'boom';
 import AdminService from '../services/admin.service';
+import { User } from 'interfaces/register.interface';
+//import {ChaincodeExecOption} from 'interfaces/enums.interface';
 import DbService from '../services/db.service';
 var _ = require('underscore');
-import CAParams from '../interfaces/caParams.interface';
-import validatorHandler from '../middlewares/validator.handler';
-import { nextTick } from 'process';
+import Chaincode from 'interfaces/NFT.interface';
+import { NETWORK_SCOPE_ANYFORTX } from 'fabric-network/lib/impl/event/defaulteventhandlerstrategies';
 class AdminRouter {
   router: express.Router;
   adminService: AdminService;
@@ -22,81 +22,96 @@ class AdminRouter {
       console.log(info);
       res.json(info);
     });
-
-    this.router.post('/register', async (req, res) => {
-      const config = req.body;
-      const response = await this.dbService.registerOrg(config);
-      res.json(response);
-    });
-
-
-    this.router.post('/mint', async (request, response, next) => {
-      let config: Record<string, any>;
+    /** Registers a an organization and creates its corresponding wallet */
+    this.router.post('/register', async (req, res, next) => {
       try {
-        const orgConfig = request.query.config as string;
-        let cf = await this.dbService.GetConnectionConfig(orgConfig);
-        config = cf as Record<string, any>;
-      }
-      catch (error) {
-        throw (error);
-      }
-      const ccp = request.body as CCParams;
-      if (!ccp) {
-        throw ("Missing chaincode params");
-      }
-      var caHostName = this.keyAt(config.certificateAuthorities, 0);
-      const userId = ccp.userId;
-      const affiliation = ccp.affiliation;
-      const mspId = this.elementAt(config.organizations, 0).mspid;
-      const caClient = this.adminService.buildCAClient(config, caHostName)
-      const url = 'https://admin:adminpw@localhost:7984';
-      const wallet = await this.adminService.buildWallet(undefined, url);
-      await this.adminService.enrollAdmin(caClient, wallet, mspId);
-      await this.adminService.registerAndEnrollUser(caClient, wallet, mspId, userId, affiliation)
-      console.log('executing contract...');
-      const result = await this.adminService.mint(config, wallet, ccp.userId, ccp.channel, ccp.chaincode, ccp.tokenId, ccp.tokenUrl);
-      response.send(result);
-    });
-
-
-
-    this.router.post('/balance', async (request, response, next) => {
-      try {
-        const userId = request.query.userId as string;
-        const affiliation = request.query.affiliation as string;
-        const chaincode = request.query.chaincode as string;
-        const channel = request.query.channel as string;
-        const tokenId = request.query.tokenId as string;
-        const tokenUrl = request.query.tokenUrl as string;
-        const ccp: Record<string, any> = request.body;
-        if (!ccp) {
-          throw ("Missing connection profile as json body");
-        }
-        if (!ccp || !userId || !affiliation || !chaincode || !channel || !tokenId || !tokenUrl) {
-          throw (`Error, missing parameters required in URL userId=${userId}&affiliation=${affiliation}&chaincode:${chaincode}&channel:${channel}&tokenId${tokenId}&tokenUrl=${tokenUrl}`);
-        }
-        var caHostName = this.keyAt(ccp.certificateAuthorities, 0);
-        const mspId = this.elementAt(ccp.organizations, 0).mspid;
-        const caClient = this.adminService.buildCAClient(ccp, caHostName)
-        const url = 'https://admin:adminpw@localhost:7984';
-        const wallet = await this.adminService.buildWallet(undefined, url);
-        await this.adminService.enrollAdmin(caClient, wallet, mspId);
-        await this.adminService.registerAndEnrollUser(caClient, wallet, mspId, userId, affiliation)
-        console.log('executing contract...');
-        const result = await this.adminService.chaincode(ccp, wallet, userId, channel, chaincode, tokenId, tokenUrl);
-        response.send(result);
+        const config = req.body;
+        const orgId = config.client.organization;
+        config._id = orgId;
+        await this.dbService.registerOrg(config);
+        const walletUrl = config.organizations[orgId].walletUrl as string;
+        const certificateAuthority = config.organizations[orgId].certificateAuthorities[0];
+        const authorityConfig = config.certificateAuthorities[certificateAuthority];
+        const caClient = this.adminService.buildCAClient(authorityConfig)
+        const wallet = await this.adminService.buildWallet(undefined, walletUrl);
+        await this.adminService.enrollAdmin(caClient, wallet, config.organizations[orgId].mspid);
+        res.json(`Organization ${orgId} registered successfully`);
       }
       catch (error) {
         next(error);
       }
     });
-  }
 
-  keyAt(element: any, idx: number) {
-    return Object.keys(element)[idx];
-  }
-  elementAt(element: any, idx: number): any {
-    return element[Object.keys(element)[idx]];
+    this.router.post('/enroll', async (req, res, next) => {
+      const user = req.body as User;
+      const orgId = user.organization;
+      const config = await this.dbService.GetConfig(orgId);
+      if (!user) {
+        next(`Could not find user configuration`)
+      }
+      if (!config) {
+        next(`Could not find configuration set with id ${orgId}`)
+      }
+      else {
+        const certificateAuthority = config.organizations[orgId].certificateAuthorities[0];
+        const authorityConfig = config.certificateAuthorities[certificateAuthority];
+        const walletUrl = config.organizations[orgId].walletUrl as string;
+        const caClient = this.adminService.buildCAClient(authorityConfig);
+        const mspId = config.organizations[orgId].mspid;
+        const wallet = await this.adminService.buildWallet(undefined, walletUrl);
+        await this.adminService.registerAndEnrollUser(caClient, wallet, mspId, user.name, user.affilitation);
+        res.json(`User ${user.name} registerd with affiliation ${user.affilitation} for organization ${orgId}`);
+      }
+    });
+
+    this.router.post('/mint', async (req, res, next) => {
+      try {
+        const chaincode = req.body as Chaincode;
+        console.log('Recovering credentials....');
+        const orgId = chaincode.organization;
+        let config = await this.dbService.GetConfig(orgId);
+        const walletUrl = config.organizations[orgId].walletUrl as string;
+        const wallet = await this.adminService.buildWallet(undefined, walletUrl);
+        console.log('executing contract...');
+        const result = await this.adminService.mint(config, wallet, chaincode.userId, chaincode.channel, chaincode.name, chaincode.params.tokenId, chaincode.params.tokenUrl);
+        res.send(result);
+      }
+      catch (error) {
+        next(error);
+      }
+    });
+
+    this.router.get('/chaincode', async (req, res, next) => {
+      try {
+        const cc = req.body as Chaincode;
+        const orgId = cc.organization;
+        let config = await this.dbService.GetConfig(orgId);
+        const walletUrl = config.organizations[orgId].walletUrl as string;
+        const wallet = await this.adminService.buildWallet(undefined, walletUrl);
+        const parms = Object.values(cc.params);
+        const result = await this.adminService.chaincode('Read', config, wallet, cc.userId, cc.channel, cc.name, cc.functionName, ...parms);
+        res.send(result);
+      }
+      catch (error) {
+        next(error);
+      }
+    });
+
+    this.router.post('/chaincode', async (req, res, next) => {
+      try {
+        const cc = req.body as Chaincode;
+        const orgId = cc.organization;
+        let config = await this.dbService.GetConfig(orgId);
+        const walletUrl = config.organizations[orgId].walletUrl as string;
+        const wallet = await this.adminService.buildWallet(undefined, walletUrl);
+        const parms = Object.values(cc.params);
+        const result = await this.adminService.chaincode('Write', config, wallet, cc.userId, cc.channel, cc.name, cc.functionName, ...parms);
+        res.send(result);
+      }
+      catch (error) {
+        next(error);
+      }
+    });
   }
 }
 export default AdminRouter;

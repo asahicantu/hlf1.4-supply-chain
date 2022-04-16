@@ -107,7 +107,7 @@ if [ "$MODE" == "start" ]; then
 elif [ "$MODE" == "deployCC" ]; then
     infoln "Deploying chaincode"
     chaincodeName="erc721"
-    ./scripts/deployCC.sh $CHANNEL_NAME $chaincodeName "../chaincode/token-erc-721/chaincode-javascript" "javascript"
+    ./scripts/deployCC.sh $CHANNEL_NAME $chaincodeName "../chaincode/token-erc-721/chaincode-javascript" "javascript" "12.0" "10"
     #./network.sh deployCC -ccn erc1155 -ccp ../token-erc-1155/chaincode-go/ -ccl go
     #./scripts/deployCC.sh $CHANNEL_NAME $CC_NAME $CC_SRC_PATH $CC_SRC_LANGUAGE $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_INVK_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
     #./network.sh deployCC -ccn basic -ccp ../chaincode/token-erc-20/chaincode-go -ccl go
