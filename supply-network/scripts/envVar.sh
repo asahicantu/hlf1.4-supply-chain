@@ -27,4 +27,5 @@ export FABRIC_CRYPTO_PATH=${PWD}/organizations
 export FABRIC_USER_ADMIN=admin
 export FABRIC_USER_ADMIN_PW=adminpw
 
+export SWARM_FILE_PATH=compose/ipfs/swarm.key
 export IPFS_CLUSTER_SECRET=e35951fe7d0911de15a7657ea80af8f1ea6c482420bed9fdf9473832d935b6b6

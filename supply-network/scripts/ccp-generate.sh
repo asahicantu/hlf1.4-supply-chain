@@ -39,8 +39,8 @@ CAPORT=7054
 PEERPEM=organizations/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
 CAPEM=organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem
 
-COUCHDB_USR=admin
-COUCHDB_PSW=adminpw
+COUCHDB_USR=${FABRIC_USER_ADMIN}
+COUCHDB_PSW=${FABRIC_USER_ADMIN_PW}
 COUCHDB_PORT=5984
 
 echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM $COUCHDB_USR $COUCHDB_PSW $COUCHDB_PORT)" > organizations/peerOrganizations/org1.example.com/connection-org1.json
@@ -51,8 +51,8 @@ P0PORT=9051
 CAPORT=8054
 PEERPEM=organizations/peerOrganizations/org2.example.com/tlsca/tlsca.org2.example.com-cert.pem
 CAPEM=organizations/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem
-COUCHDB_USR=admin
-COUCHDB_PSW=adminpw
+COUCHDB_USR=${FABRIC_USER_ADMIN}
+COUCHDB_PSW=${FABRIC_USER_ADMIN_PW}
 COUCHDB_PORT=7984
 
 

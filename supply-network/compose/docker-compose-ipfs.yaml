@@ -1,75 +1,66 @@
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
-version: '3.7'
-
-volumes:
-  ipfs-staging-node0.org1.example.com:
-  ipfs-node0.org1.example.com:
-  ipfs-staging-node1.org1.example.com:
-  ipfs-node1.org1.example.com:
-  vol-ipfs-cluster0:
-  vol-ipfs-cluster1:
+version: "3"
+# extension fields
+x-base: &base
+  image: ipfs/go-ipfs:latest
+  networks:
+    - ipfs
+  environment:
+    LIBP2P_FORCE_PNET: "1"
+    SWARM_PEER:
+  volumes:
+    - ${SWARM_FILE_PATH}:/data/ipfs/swarm.key
+    - ./ipfs/init.sh:/usr/local/bin/start_ipfs  
 
 networks:
-  test:
+  ipfs:
     name: ${COMPOSE_NETWORK_NAME}
 
 services:
-  #cluster peer0
-  ipfs-node0:
-    container_name: ipfs-node0
-    image: ipfs/go-ipfs:latest
-    labels:
-      service: ipfs-node0
-    volumes:
-      - ipfs-staging-node0.org1.example.com:/export
-      - ipfs-node0.org1.example.com:/data/ipfs
+  ipfs_bootstrap_node:
+    container_name: ipfs_bootstrap_node
+    hostname: ipfs_bootstrap_node
+    <<: *base
+    expose:
+      - 4001
+      - 5001
     ports:
-      - 7080:8080 # ipfs gateway 
-      - 7001:4001 # ipfs swarm
-      - 7005:5001 # ipfs api
-    networks:
-      - test
+      - "4001:4001"
+      - "5001:5001"
 
-  ipfs-cluster0:
-    container_name: ipfs-cluster0
-    image: ipfs/ipfs-cluster:latest
+  ipfs_node_2:
+    container_name: ipfs_node_2
+    hostname: ipfs_node_2
+    <<: *base
+    expose:
+      - 4002
+      - 5002
+    ports:
+      - "4002:4001"
+      - "5002:5001"
+  
+  ipfs_node_3:
+    container_name: ipfs_node_3
+    hostname: ipfs_node_3
+    <<: *base
+    expose:
+      - 4003
+      - 5003
+    ports:
+      - "4003:4001"
+      - "5003:5001"
+
+  ipfs_dashboard:
+    container_name: ipfs_dashboard
+    hostname: ipfs_dashboard
+    networks:
+      - ipfs
+    build:
+      dockerfile: ipfs/Dockerfile_Dashboard
     depends_on:
-      - ipfs-node0
-    environment:
-      CLUSTER_PEERNAME: ipfs-cluster0
-      CLUSTER_SECRET: ${IPFS_CLUSTER_SECRET}
-      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs-node0/tcp/7005
-      CLUSTER_CRDT_TRUSTEDPEERS: '*' # Trust all peers in Cluster
-      CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API
-      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
+      - bootstrap_node
+      - ipfs_node_2
+      - ipfs_node_3
+    expose:
+      - 8080
     ports:
-          # Open API port (allows ipfs-cluster-ctl usage on host)
-          #- "127.0.0.1:9094:9094"
-          - 9094:9094
-          # The cluster swarm port would need  to be exposed if this container
-          # was to connect to cluster peers on other hosts.
-          # But this is just a testing cluster.
-          - 9096:9096 # Cluster IPFS Proxy endpoint
-    volumes:
-      - vol-ipfs-cluster0:/data/ipfs-cluster
-    networks:
-      - test
-  #cluster peer1
-  ipfs-node1:
-    container_name: ipfs-node1
-    image: ipfs/go-ipfs:latest
-    labels:
-      service: ipfs-node1
-    volumes:
-      - ipfs-staging-node1.org1.example.com:/export
-      - ipfs-node1.org1.example.com:/data/ipfs
-    ports:
-      - 9080:8080 # ipfs gateway 
-      - 9001:4001 # ipfs swarm
-      - 9005:5001 # ipfs api
-    networks:
-      - test
+      - "8080:8080"
