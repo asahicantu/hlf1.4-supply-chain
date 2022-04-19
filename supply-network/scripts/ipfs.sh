@@ -1,13 +1,18 @@
-#!/bin/sh
-source scripts/utils.sh
+#!/bin/bash
 source scripts/envVar.sh
-# init.sh executable
-infoln "Configuring IPFS Dashboard and nodes..."
+source scripts/utils.sh
+infoln "***********************************"
+infoln "       Configuring IPFS Services   "
+infoln "***********************************"
+
 chmod +x compose/ipfs/init.sh
 
-infoln "Generating a swarm key..."
-# Generate a swarm key and output into a file 
-docker run --rm golang:1.9 sh -c 'go get github.com/Kubuxu/go-ipfs-swarm-key-gen/ipfs-swarm-key-gen && ipfs-swarm-key-gen' >> $SWARM_FILE_PATH
+# infoln "Generating a swarm key"
+# # Generate a swarm key and output into a file 
+# docker run --rm golang:1.9 sh -c 'go get github.com/Kubuxu/go-ipfs-swarm-key-gen/ipfs-swarm-key-gen && ipfs-swarm-key-gen' > ./compose/ipfs/swarm.key
+
+infoln "Composing services..."
+docker compose -f ./compose/docker-compose-ipfs.yaml up -d
 
 infoln "Setting up directories..."
 # needs jq package

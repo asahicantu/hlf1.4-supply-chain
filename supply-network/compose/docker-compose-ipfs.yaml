@@ -3,17 +3,18 @@ version: "3"
 x-base: &base
   image: ipfs/go-ipfs:latest
   networks:
-    - ipfs
+    - test
   environment:
     LIBP2P_FORCE_PNET: "1"
     SWARM_PEER:
   volumes:
-    - ${SWARM_FILE_PATH}:/data/ipfs/swarm.key
-    - ./ipfs/init.sh:/usr/local/bin/start_ipfs  
+    - ./ipfs/swarm.key:/data/ipfs/swarm.key:ro
+    - ./ipfs/init.sh:/usr/local/bin/start_ipfs:ro  
 
 networks:
-  ipfs:
-    name: ${COMPOSE_NETWORK_NAME}
+  test:
+    # name: ${COMPOSE_NETWORK_NAME}
+    name: test
 
 services:
   ipfs_bootstrap_node:
@@ -53,7 +54,7 @@ services:
     container_name: ipfs_dashboard
     hostname: ipfs_dashboard
     networks:
-      - ipfs
+      - test
     build:
       dockerfile: ipfs/Dockerfile_Dashboard
     depends_on:

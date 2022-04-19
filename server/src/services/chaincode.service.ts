@@ -1,6 +1,5 @@
 import * as grpc from '@grpc/grpc-js';
 import { connect, Contract, Identity, ProposalOptions, Signer, signers, Network, CloseableAsyncIterable, ChaincodeEvent, GatewayError } from '@hyperledger/fabric-gateway';
-import { Gateway, GatewayOptions } from 'fabric-network';
 import * as crypto from 'crypto';
 import { promises as fs } from 'fs';
 import * as path from 'path';
@@ -8,6 +7,9 @@ import { TextDecoder } from 'util';
 import HyperledgerParams from '../interfaces/hyperledgerParams.interface'
 import ConnectionParams from '../interfaces/connectionParams.interface'
 import { conflict } from 'boom';
+import { Gateway, GatewayOptions, Wallet, Wallets} from 'fabric-network';
+import { User, Client } from 'fabric-common';
+
 
 class ChaincodeService {
   utf8Decoder: TextDecoder = new TextDecoder();
@@ -173,6 +175,85 @@ class ChaincodeService {
   async displayInputParameters(): Promise<HyperledgerParams> {
     return this.params;
   }
+
+
+
+  async mint(config: Record<string,any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, tokenId:string, tokenUrl:string):Promise<any> {
+    const gateway = new Gateway();
+    const gatewayOpts: GatewayOptions = {
+      wallet: wallet,
+      identity: userId,
+      discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+    };
+    try {
+      let client = new Client(userId);
+      console.log(client);
+      console.log('Connecting to gateway...');
+      await gateway.connect(config, gatewayOpts);
+      console.log(gateway.getIdentity());
+      console.log('Getting network...', channelName);
+      const network = await gateway.getNetwork(channelName);
+      console.log('Getting contract...');
+      const contract = network.getContract(chaincodeName);
+      console.log('Executing Chaincode...');
+      const result = await contract.submitTransaction('MintWithTokenURI', tokenId, tokenUrl);
+      console.log('*** Result: committed', result);
+      if (`${result}` !== '') {
+        return result;
+      }
+      return "ok";
+    }
+    catch(error){
+      throw(error);
+    }
+    finally {
+      // Disconnect from the gateway when the application is closing
+      // This will close all connections to the network
+      gateway.disconnect();
+    }
+  }
+
+
+  async chaincode(execMode:string, ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, functionName:string, ...args:string[]):Promise<string|any> {
+    const gateway = new Gateway();
+    const gatewayOpts: GatewayOptions = {
+      wallet: wallet,
+      identity: userId,
+      discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+    };
+    try {
+      console.log('Connecting to gateway...');
+      await gateway.connect(ccp, gatewayOpts);
+      console.log('Getting network...', channelName);
+      const network = await gateway.getNetwork(channelName);
+      console.log('Getting contract...');
+      const contract = network.getContract(chaincodeName);
+      let result :any;
+      if(execMode == 'Read'){
+        console.log('Reading Chaincode...');
+        result = await contract.evaluateTransaction(functionName,...args);
+      }
+      if(execMode == 'Write'){
+        console.log('Executing Chaincode...');
+        result = await contract.submitTransaction(functionName,...args);
+      }
+      console.log('*** Result: committed', result.toString());
+      if (`${result}` !== '') {
+        //const resultMessage = this.prettyJSONString(result.toString());
+        return result;
+      }
+      return result.toString();
+    }
+    catch(error){
+      throw(error);
+    }
+    finally {
+      // Disconnect from the gateway when the application is closing
+      // This will close all connections to the network
+      gateway.disconnect();
+    }
+  }
+
 
 }
 

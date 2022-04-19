@@ -25,7 +25,6 @@ removeDir "channel-artifacts"
 removeDir "wallet"
 removeDir "chaincode/go/chaincode-go/vendor"
 removeDir "chaincode/go/pkg"
-removeFile 'compose/ipfs/swarm.key'
     
 successln "***********************************"
 successln "       Network stopped!            "

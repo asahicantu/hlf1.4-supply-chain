@@ -102,6 +102,7 @@ done
 
 if [ "$MODE" == "start" ]; then
     ./scripts/start.sh
+    ./scripts/ipfs.sh
     chaincodeName="erc721"
     ./scripts/deployCC.sh $CHANNEL_NAME $chaincodeName "../chaincode/token-erc-721/chaincode-javascript" "javascript"
 elif [ "$MODE" == "deployCC" ]; then
@@ -113,6 +114,8 @@ elif [ "$MODE" == "deployCC" ]; then
     #./network.sh deployCC -ccn basic -ccp ../chaincode/token-erc-20/chaincode-go -ccl go
 elif [ "$MODE" == "stop" ]; then
     ./scripts/stop.sh
+elif [ "$MODE" == "ipfs" ]; then
+    ./scripts/ipfs.sh
 elif [ "$MODE" == "restart" ]; then
     ./scripts/stop.sh
     ./scripts/start.sh
