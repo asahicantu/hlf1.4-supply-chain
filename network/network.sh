@@ -11,14 +11,6 @@ else
   shift
 fi
 
-# parse a createChannel subcommand if used
-if [[ $# -ge 1 ]] ; then
-  key="$1"
-  if [[ "$key" == "createChannel" ]]; then
-      export MODE="createChannel"
-      shift
-  fi
-fi
 
 # parse flags
 while [[ $# -ge 1 ]] ; do
@@ -27,68 +19,6 @@ while [[ $# -ge 1 ]] ; do
     -h )
         printHelp $MODE
         exit 0
-        ;;
-    -c )
-        CHANNEL_NAME="$2"
-        shift
-        ;;
-    -ca )
-        CRYPTO="Certificate Authorities"
-        ;;
-    -r )
-        MAX_RETRY="$2"
-        shift
-        ;;
-    -d )
-        CLI_DELAY="$2"
-        shift
-        ;;
-    -s )
-        DATABASE="$2"
-        shift
-        ;;
-    -ccl )
-        CC_SRC_LANGUAGE="$2"
-        shift
-        ;;
-    -ccn )
-        CC_NAME="$2"
-        shift
-        ;;
-    -ccv )
-        CC_VERSION="$2"
-        shift
-        ;;
-    -ccs )
-        CC_SEQUENCE="$2"
-        shift
-        ;;
-    -ccp )
-        CC_SRC_PATH="$2"
-        shift
-        ;;
-    -ccep )
-        CC_END_POLICY="$2"
-        shift
-        ;;
-    -cccg )
-        CC_COLL_CONFIG="$2"
-        shift
-        ;;
-    -cci )
-        CC_INIT_FCN="$2"
-        shift
-        ;;
-    -ccf )
-        CC_INVK_FCN="$2"
-        shift
-        ;;
-    -ccaasdocker )
-        CCAAS_DOCKER_RUN="$2"
-        shift
-        ;;
-    -verbose )
-        VERBOSE=true
         ;;
     * )
         errorln "Unknown flag: $key"
@@ -114,16 +44,9 @@ elif [ "$MODE" == "deployCC" ]; then
     #./network.sh deployCC -ccn basic -ccp ../chaincode/token-erc-20/chaincode-go -ccl go
 elif [ "$MODE" == "stop" ]; then
     ./scripts/stop.sh
-elif [ "$MODE" == "ipfs" ]; then
-    ./scripts/ipfs.sh
 elif [ "$MODE" == "restart" ]; then
     ./scripts/stop.sh
     ./scripts/start.sh
-elif [ "$MODE" == "install" ]; then
-    cd ./chaincode
-    npm install
-    cd ..
-    npm install
 else
     printHelp
 fi
