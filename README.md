@@ -323,3 +323,11 @@ npx create-react-app react-nft-app
 ### Docker configuration for a private IPFS NETWORK
 [https://github.com/owenlo/private-ipfs-docker](https://github.com/owenlo/private-ipfs-docker)
 [https://github.com/ipfs/ipfs-cluster](https://github.com/ipfs/ipfs-cluster)
+
+
+
+* Find a way to store proper file metadata
+* Raw Text
+* Image 
+* Video
+* bion / 3d models

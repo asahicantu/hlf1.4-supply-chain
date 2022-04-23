@@ -3,8 +3,8 @@
 version: '2.1'
 
 volumes:
-  pgdata:
-  walletstore:
+  nft_pgdata:
+  nft_walletstore:
 
 networks:
   test:
@@ -26,7 +26,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - nft_pgdata:/var/lib/postgresql/data
     networks:
       - test
 
@@ -48,7 +48,7 @@ services:
       - ${EXPLORER_CONFIG_FILE_PATH}:/opt/explorer/app/platform/fabric/config.json
       - ${EXPLORER_PROFILE_DIR_PATH}:/opt/explorer/app/platform/fabric/connection-profile
       - ${FABRIC_CRYPTO_PATH}:/tmp/crypto
-      - walletstore:/opt/explorer/wallet
+      - nft_walletstore:/opt/explorer/wallet
     ports:
       - 9090:8080
     depends_on:
