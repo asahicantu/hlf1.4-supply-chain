@@ -7,8 +7,10 @@ import { TextDecoder } from 'util'
 import HyperledgerParams from '../interfaces/hyperledgerParams.interface'
 import ConnectionParams from '../interfaces/connectionParams.interface'
 import { conflict } from 'boom'
-import { Gateway, GatewayOptions, Wallet, Wallets} from 'fabric-network'
+import { Gateway, GatewayOptions, Wallet, Wallets } from 'fabric-network'
 import { User, Client } from 'fabric-common'
+import { NFT } from '../../../chaincode/token-erc-721/chaincode-typescript/src/nft'
+import { json2array } from '../utils/ccUtils'
 
 
 class ChaincodeService {
@@ -16,21 +18,21 @@ class ChaincodeService {
   network: Network
   params: HyperledgerParams
 
-  resolveParams(params: ConnectionParams) : HyperledgerParams{
-    const rootPath = path.resolve(__dirname, '..','..', '..', 'supply-network', 'organizations', 'peerOrganizations', params.organization)
+  resolveParams(params: ConnectionParams): HyperledgerParams {
+    const rootPath = path.resolve(__dirname, '..', '..', '..', 'supply-network', 'organizations', 'peerOrganizations', params.organization)
     const fullIdName = `${params.idName}@${params.organization}`
     const fullPeerName = `${params.peerName}.${params.organization}`
     const cryptoPath = path.resolve(rootPath, 'users', fullIdName, 'msp')
-    const hyperledgerParams : HyperledgerParams = {
+    const hyperledgerParams: HyperledgerParams = {
       rootPath: rootPath,
-      keyDirectoryPath : path.resolve(cryptoPath, 'keystore'),
+      keyDirectoryPath: path.resolve(cryptoPath, 'keystore'),
       certPath: path.resolve(cryptoPath, 'signcerts', 'cert.pem'),
-      tlsCertPath:  path.resolve(rootPath, 'peers', fullPeerName, 'tls', 'ca.crt'),
+      tlsCertPath: path.resolve(rootPath, 'peers', fullPeerName, 'tls', 'ca.crt'),
       peerEndpoint: params.peerEndpoint,
       chaincodeName: params.chaincodeName,
       mspId: params.mspId,
       channelName: params.channelName,
-      peerHostAlias:fullPeerName
+      peerHostAlias: fullPeerName
     }
     return hyperledgerParams
 
@@ -60,7 +62,7 @@ class ChaincodeService {
       },
     })
     // Get a network instance representing the channel where the smart contract is deployed.
-     this.network = gateway.getNetwork(this.params.channelName)
+    this.network = gateway.getNetwork(this.params.channelName)
   }
 
   async newGrpcConnection(): Promise<grpc.Client> {
@@ -156,7 +158,7 @@ class ChaincodeService {
     const events = await this.network.getChaincodeEvents(this.params.chaincodeName, {
       startBlock,
     })
-    let retVal:unknown[] = []
+    let retVal: unknown[] = []
     try {
       for await (const event of events) {
         const payload = this.parseJson(event.payload)
@@ -178,7 +180,7 @@ class ChaincodeService {
 
 
 
-  async mint(config: Record<string,any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, tokenId:string, tokenUrl:string):Promise<any> {
+  async mint(config: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, nftToken: NFT): Promise<any> {
     const gateway = new Gateway()
     const gatewayOpts: GatewayOptions = {
       wallet: wallet,
@@ -196,15 +198,17 @@ class ChaincodeService {
       console.log('Getting contract...')
       const contract = network.getContract(chaincodeName)
       console.log('Executing Chaincode...')
-      const result = await contract.submitTransaction('Mint', tokenId, tokenUrl)
+      var jsonprops = json2array(nftToken)
+      console.log(jsonprops)
+      const result = await contract.submitTransaction('Mint', ...jsonprops)
       console.log('*** Result: committed', result)
       if (`${result}` !== '') {
         return result
       }
       return 'ok'
     }
-    catch(error){
-      throw(error)
+    catch (error) {
+      throw (error)
     }
     finally {
       // Disconnect from the gateway when the application is closing
@@ -214,7 +218,7 @@ class ChaincodeService {
   }
 
 
-  async chaincode(execMode:string, ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, functionName:string, ...args:string[]):Promise<string|any> {
+  async chaincode(execMode: string, ccp: Record<string, any>, wallet: Wallet, userId: string, channelName: string, chaincodeName: string, functionName: string, ...args: string[]): Promise<string | any> {
     const gateway = new Gateway()
     const gatewayOpts: GatewayOptions = {
       wallet: wallet,
@@ -228,14 +232,14 @@ class ChaincodeService {
       const network = await gateway.getNetwork(channelName)
       console.log('Getting contract...')
       const contract = network.getContract(chaincodeName)
-      let result :any
-      if(execMode == 'Read'){
+      let result: any
+      if (execMode == 'Read') {
         console.log('Reading Chaincode...')
-        result = await contract.evaluateTransaction(functionName,...args)
+        result = await contract.evaluateTransaction(functionName, ...args)
       }
-      if(execMode == 'Write'){
+      if (execMode == 'Write') {
         console.log('Executing Chaincode...')
-        result = await contract.submitTransaction(functionName,...args)
+        result = await contract.submitTransaction(functionName, ...args)
       }
       console.log('*** Result: committed', result.toString())
       if (`${result}` !== '') {
@@ -244,8 +248,8 @@ class ChaincodeService {
       }
       return result.toString()
     }
-    catch(error){
-      throw(error)
+    catch (error) {
+      throw (error)
     }
     finally {
       // Disconnect from the gateway when the application is closing

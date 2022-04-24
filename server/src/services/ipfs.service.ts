@@ -4,6 +4,7 @@ import { AddAllOptions, AddOptions, AddResult, CatOptions, IDOptions, IDResult, 
 import { ImportCandidate, ImportCandidateStream, IPFSPath, ToContent, ToDirectory, ToFile, ToFileMetadata } from 'ipfs-core-types/src/utils'
 import { optional } from 'joi'
 import { chown } from 'fs'
+import { GetOptions } from 'ipfs-core-types/src/dag'
 
 export default class IPFSService {
   ipfsNode: IPFSHTTPClient
@@ -33,13 +34,22 @@ export default class IPFSService {
     return addedFile
   }
 
-
-  public cat(path: IPFSPath, options: CatOptions): AsyncIterable<Uint8Array> {
-    return this.ipfsNode.cat(path, options)
+  public async cat(path: IPFSPath, options: CatOptions): Promise<Array<Uint8Array>> {
+    let elements = await  this.ipfsNode.cat(path,options)
+    let files : Array<Uint8Array> = []
+    for await (const element of elements){
+      files.push(element)
+    }
+    return files
   }
 
-  public  get(path: IPFSPath): AsyncIterable<Uint8Array> {
-    return this.ipfsNode.get(path)
+  public  async get(path: IPFSPath, options: GetOptions): Promise<Array<Uint8Array>> {
+    let elements = await  this.ipfsNode.get(path,options)
+    let files : Array<Uint8Array> = []
+    for await (const element of elements){
+      files.push(element)
+    }
+    return files
   }
 
   public list(path: IPFSPath, options: ListOptions): AsyncIterable<IPFSEntry> {

@@ -5,7 +5,8 @@ import AdminService from 'services/admin.service'
 import DbService from '../services/db.service'
 import IPFSService from '../services/ipfs.service'
 import { ImportCandidateStream, IPFSPath, ToContent } from 'ipfs-core-types/src/utils'
-import { AddAllOptions, CatOptions, IDOptions, ListOptions } from 'ipfs-core-types/src/root'
+import { AddAllOptions, CatOptions, GetOptions, IDOptions, ListOptions } from 'ipfs-core-types/src/root'
+import { CID } from 'ipfs-http-client'
 
 export default class IPFSRouter {
   router: express.Router
@@ -43,15 +44,20 @@ export default class IPFSRouter {
     this.router.get('/cat', async (req, res) => {
       let path = req.query.path as string
       let options: CatOptions = req.body.options
-      let content = this.ipfsService.cat(path, options)
+      let content = await this.ipfsService.cat(path, options)
       res.json(content)
     })
 
 
-    this.router.get('/get', (req, res) => {
+    this.router.get('/get', async (req, res) => {
       let path = req.query.path as string
-      let content = this.ipfsService.get(path)
-      res.json(content)
+      if(true){
+        let options : GetOptions = {
+          archive: true
+        }
+        let content = await this.ipfsService.get(path, options)
+        res.json(content)
+      }
     })
 
 
