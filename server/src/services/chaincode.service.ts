@@ -11,7 +11,7 @@ import { Gateway, GatewayOptions, Wallet, Wallets } from 'fabric-network'
 import { User, Client } from 'fabric-common'
 import { NFT } from '../../../chaincode/token-erc-721/chaincode-typescript/src/nft'
 import { json2array } from '../utils/ccUtils'
-
+import { Guid } from 'guid-typescript'
 
 class ChaincodeService {
   utf8Decoder: TextDecoder = new TextDecoder()
@@ -198,9 +198,9 @@ class ChaincodeService {
       console.log('Getting contract...')
       const contract = network.getContract(chaincodeName)
       console.log('Executing Chaincode...')
-      var jsonprops = json2array(nftToken)
-      console.log(jsonprops)
-      const result = await contract.submitTransaction('Mint', ...jsonprops)
+      console.log(nftToken)
+      nftToken.ID = Guid.create().toString()
+      const result = await contract.submitTransaction('Mint', nftToken.ID, nftToken.URI, nftToken.FileFormat, nftToken.Owner, nftToken.Organization, nftToken.FileName)
       console.log('*** Result: committed', result)
       if (`${result}` !== '') {
         return result

@@ -58,7 +58,7 @@ class ChaincodeRouter {
         const walletUrl = config.organizations[orgId].walletUrl as string
         const wallet = await this.adminService.buildWallet(undefined, walletUrl)
         console.log('executing contract...')
-        const nftToken = chaincode.params as NFT
+        const nftToken : NFT = <NFT>chaincode.params
         const data = req.body.data as Uint8Array
         const ipfsResult = await this.ipfsService.addFile(nftToken.FileName,data)
         console.log(ipfsResult)
