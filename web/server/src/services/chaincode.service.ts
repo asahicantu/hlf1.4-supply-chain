@@ -257,9 +257,5 @@ class ChaincodeService {
       gateway.disconnect()
     }
   }
-
-
 }
-
 export default ChaincodeService
-
